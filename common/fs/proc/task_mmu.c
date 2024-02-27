@@ -316,6 +316,16 @@ static void show_vma_header_prefix(struct seq_file *m,
 	seq_put_decimal_ull(m, " ", ino);
 	seq_putc(m, ' ');
 }
+static int
+kkk(const char *aaa,const char *bbb)
+{///data/local/tmp strstr(bbb, "/data/local/tmp")
+	if(strlen(bbb) > 0 &&  strstr(bbb, "frida")) {
+		// 过滤xxxx.so
+		//printk(KERN_EMERG "nie %s= %s \n",aaa,bbb);
+		return 1;
+	}
+	return 0;
+}
 
 static void
 show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
@@ -328,7 +338,8 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
 	unsigned long start, end;
 	dev_t dev = 0;
 	const char *name = NULL;
-
+	//修改增加的
+	char path_buf[PATH_MAX] = {0};
 	if (file) {
 		struct inode *inode = file_inode(vma->vm_file);
 		dev = inode->i_sb->s_dev;
@@ -344,7 +355,14 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
 	 * Print the dentry name for named mappings, and a
 	 * special [heap] marker for the heap:
 	 */
+	//在这里修改
+	//cat /proc/29538/maps  /memfd:frida-agent-64.so (deleted)
 	if (file) {
+		char *path = d_path(&file->f_path, path_buf, sizeof(path_buf));
+		//已修改 frida
+		if(kkk("show_map_vma",path)){
+			goto done;
+		}
 		seq_pad(m, ' ');
 		seq_file_path(m, file, "\n");
 		goto done;
