@@ -394,6 +394,11 @@ static int proc_pid_wchan(struct seq_file *m, struct pid_namespace *ns,
 
 	wchan = get_wchan(task);
 	if (wchan && !lookup_symbol_name(wchan, symname)) {
+		 ///ADD START  已修改
+		if(strstr(symname,"trace")){
+			seq_printf(m, "%s", "sys_epoll_wait");
+			return 0;
+		}
 		seq_puts(m, symname);
 		return 0;
 	}
