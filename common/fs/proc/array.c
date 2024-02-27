@@ -94,7 +94,17 @@
 
 #include <asm/processor.h>
 #include "internal.h"
-
+//已修改
+static int
+kkk(const char *aaa,const char *bbb)
+{//pool-spawner magisk libriru
+        if(strstr(bbb, "libriru") || strstr(bbb, "magisk") ||  strstr(bbb, "pool-spawner") || strstr(bbb, "frida") || strstr(bbb, "gum-js-loop") || strstr(bbb, "gmain") || strstr(    bbb, "gdbus") || strstr(bbb, "REJECT") || strstr(bbb, "linjector")) {
+                // 过滤xxxx.so
+	 	///printk(KERN_EMERG "nie %s= %s \n",aaa,bbb);
+                return 1;
+        }
+        return 0;
+}
 void proc_task_name(struct seq_file *m, struct task_struct *p, bool escape)
 {
 	char *buf;
@@ -107,6 +117,13 @@ void proc_task_name(struct seq_file *m, struct task_struct *p, bool escape)
 	else
 		__get_task_comm(tcomm, sizeof(tcomm), p);
 
+	//已修改 frida 反检测
+	if (kkk("proc_task_name",tcomm)) {
+		tcomm[0] = 'n';
+		tcomm[1] = 'i';
+		tcomm[2] = 'e';
+		tcomm[3] = '\0';
+	}
 	size = seq_get_buf(m, &buf);
 	if (escape) {
 		ret = string_escape_str(tcomm, buf, size,
@@ -132,8 +149,10 @@ static const char * const task_state_array[] = {
 	"R (running)",		/* 0x00 */
 	"S (sleeping)",		/* 0x01 */
 	"D (disk sleep)",	/* 0x02 */
-	"T (stopped)",		/* 0x04 */
-	"t (tracing stop)",	/* 0x08 */
+	//"T (stopped)",		/* 0x04 */
+ 	"S (sleeping)",       /*   4 */
+	//"t (tracing stop)",	/* 0x08 */
+	"S (sleeping)",  /*   8 */
 	"X (dead)",		/* 0x10 */
 	"Z (zombie)",		/* 0x20 */
 	"P (parked)",		/* 0x40 */
